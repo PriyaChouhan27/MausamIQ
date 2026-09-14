@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { PersonaId } from './types';
 import { PERSONAS, MOCK_WEATHER_DATA, WEATHER_SCENARIOS, MOCK_SEVERE_ALERT } from './data/mockData';
 import { getSuitabilityForPersona } from './smart/suitabilityCalculators';
@@ -8,14 +8,22 @@ import { PersonaSelector } from './components/PersonaSelector';
 import { PrioritizedGrid } from './components/PrioritizedGrid';
 import { ExplainabilityModal } from './components/ExplainabilityModal';
 import { PersonalizedInsightCard } from './components/PersonalizedInsightCard';
-
+import { fetchCurrentWeather } from './services/weatherApi';
 export const App: React.FC = () => {
   const [activePersonaId, setActivePersonaId] = useState<PersonaId>('fitness');
   const [currentCityId, setCurrentCityId] = useState<string>('delhi');
   const [activeScenario, setActiveScenario] = useState<string>('normal');
   const [isSafetyOverrideActive, setIsSafetyOverrideActive] = useState<boolean>(false);
   const [isExplainabilityOpen, setIsExplainabilityOpen] = useState<boolean>(false);
-
+  useEffect(() => {
+  fetchCurrentWeather(17.3850, 78.4867)
+    .then((weather) => {
+      console.log("Backend weather:", weather);
+    })
+    .catch((error) => {
+      console.log("Backend weather unavailable:", error);
+    });
+}, []);
   // Derive Current Weather from selected city + active scenario simulation
   const currentWeather = useMemo(() => {
     const base = MOCK_WEATHER_DATA[currentCityId] || MOCK_WEATHER_DATA['delhi'];

@@ -58,8 +58,14 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
             <div
               key={persona.id}
               className={`persona-chip ${isActive ? 'active' : ''}`}
-              style={{ '--accent-color': persona.accentColor } as React.CSSProperties}
-              onClick={() => onSelectPersona(persona.id)}
+              style={{
+               '--accent-color': persona.accentColor,
+               background: isActive ? 'rgba(99, 102, 241, 0.35)' : undefined,
+               border: isActive ? '2px solid #6366F1' : undefined,
+               color: isActive ? '#FFFFFF' : undefined,
+               boxShadow: isActive ? '0 0 12px rgba(99, 102, 241, 0.4)' : undefined
+               } as React.CSSProperties}
+               onClick={() => onSelectPersona(persona.id)}
             >
               <div className="persona-icon-wrapper">
                 <IconComponent size={18} />

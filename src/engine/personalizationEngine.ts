@@ -169,7 +169,7 @@ export function calculateWidgetPriorities(options: PriorityCalculationOptions): 
 
     // 1. SAFETY OVERRIDE LOGIC
     if (config.id === 'safety_alert') {
-      if (isSafetyOverrideActive || (alert && (alert.severity === 'severe' || alert.severity === 'extreme'))) {
+      if (isSafetyOverrideActive) {
         score = 1000; // Unconditional top rank
         isSafetyOverride = true;
         reason = `🚨 SAFETY OVERRIDE ACTIVE: ${alert?.title || 'Severe Thunderstorm & Flash Flood Warning'}. Safety precautions override persona preferences.`;
