@@ -8,6 +8,15 @@ export interface BackendWeatherResponse {
   windDirection: number;
   precipitation: number;
   weatherCode: number;
+  pressure?: number;
+  visibility?: number;
+  uvIndex?: number;
+  dewPoint?: number;
+  sunrise?: string;
+  sunset?: string;
+  rainfall24h?: number;
+  aqi?: number;
+  pm25?: number;
 }
 
 const getConditionFromWeatherCode = (
@@ -39,6 +48,17 @@ const getWindDirection = (degrees: number): string => {
   return directions[index];
 };
 
+const getAqiCategory = (
+  aqi: number
+): CurrentWeather['aqiCategory'] => {
+  if (aqi >= 200) return 'Severe';
+  if (aqi >= 150) return 'Unhealthy';
+  if (aqi >= 100) return 'Unhealthy for Sensitive Groups';
+  if (aqi >= 50) return 'Moderate';
+
+  return 'Good';
+};
+
 export const normalizeWeather = (
   data: BackendWeatherResponse,
   location: {
@@ -47,10 +67,11 @@ export const normalizeWeather = (
     country: string;
   }
 ): CurrentWeather => {
+  const aqi = data.aqi ?? 0;
+
   return {
     city: location.city,
     state: location.state ?? '',
-
     country: location.country,
 
     temp: data.temperature,
@@ -64,18 +85,18 @@ export const normalizeWeather = (
     windSpeed: data.windSpeed,
     windDirection: getWindDirection(data.windDirection),
 
-    pressure: 0,
-    uvIndex: 0,
-    visibility: 0,
+    pressure: data.pressure ?? 0,
+    uvIndex: data.uvIndex ?? 0,
+    visibility: data.visibility ?? 0,
 
-    aqi: 0,
-    aqiCategory: 'Good',
+    aqi,
+    aqiCategory: getAqiCategory(aqi),
 
-    dewPoint: 0,
-    rainfall24h: 0,
+    dewPoint: data.dewPoint ?? 0,
+    rainfall24h: data.rainfall24h ?? data.precipitation ?? 0,
 
-    sunrise: '',
-    sunset: '',
+    sunrise: data.sunrise ?? '',
+    sunset: data.sunset ?? '',
 
     lastUpdated: new Date().toISOString(),
   };
