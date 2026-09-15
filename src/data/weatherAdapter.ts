@@ -87,7 +87,7 @@ export const normalizeWeather = (
 
     pressure: data.pressure ?? 0,
     uvIndex: data.uvIndex ?? 0,
-    visibility: data.visibility ?? 0,
+    visibility: (data.visibility ?? 0) / 1000,
 
     aqi,
     aqiCategory: getAqiCategory(aqi),
