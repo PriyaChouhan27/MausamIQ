@@ -24,12 +24,42 @@ import {
 
 import { normalizeWeather } from './data/weatherAdapter';
 
+const CITY_COORDINATES: Record<
+  string,
+  { lat: number; lon: number }
+> = {
+  delhi: {
+    lat: 28.6139,
+    lon: 77.2090
+  },
+  mumbai: {
+    lat: 19.0760,
+    lon: 72.8777
+  },
+  bengaluru: {
+    lat: 12.9716,
+    lon: 77.5946
+  },
+  shimla: {
+    lat: 31.1048,
+    lon: 77.1734
+  },
+  goa: {
+    lat: 15.4909,
+    lon: 73.8278
+  },
+  chennai: {
+    lat: 13.0827,
+    lon: 80.2707
+  }
+};
+
 export const App: React.FC = () => {
   const [activePersonaId, setActivePersonaId] =
     useState<PersonaId>('fitness');
 
   const [currentCityId, setCurrentCityId] =
-    useState<string>('hyderabad');
+    useState<string>('delhi');
 
   const [activeScenario, setActiveScenario] =
     useState<string>('normal');
@@ -49,21 +79,30 @@ export const App: React.FC = () => {
   const [weatherError, setWeatherError] =
     useState<string | null>(null);
 
-  // Fetch live weather from backend
+  // Fetch live weather for selected city
   useEffect(() => {
     let cancelled = false;
 
-    setWeatherLoading(true);
+    const coordinates =
+      CITY_COORDINATES[currentCityId] ||
+      CITY_COORDINATES.delhi;
 
-    fetchCurrentWeather(17.3850, 78.4867)
+    setWeatherLoading(true);
+    setWeatherError(null);
+
+    fetchCurrentWeather(
+      coordinates.lat,
+      coordinates.lon
+    )
       .then((weather) => {
         if (!cancelled) {
           setBackendWeather(weather);
-          setWeatherError(null);
         }
       })
       .catch((error) => {
         if (!cancelled) {
+          setBackendWeather(null);
+
           setWeatherError(
             error instanceof Error
               ? error.message
@@ -80,7 +119,7 @@ export const App: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [currentCityId]);
 
   // Use live backend weather when available
   const currentWeather = useMemo(() => {
@@ -88,7 +127,8 @@ export const App: React.FC = () => {
       MOCK_WEATHER_DATA[currentCityId] ||
       MOCK_WEATHER_DATA['delhi'];
 
-    // Fallback to mock weather if backend is unavailable
+    // Fallback to mock weather
+    // when backend is unavailable
     if (!backendWeather) {
       const scenario =
         WEATHER_SCENARIOS[activeScenario] || {};
@@ -99,12 +139,16 @@ export const App: React.FC = () => {
       };
     }
 
-    // Convert backend weather into frontend format
-    return normalizeWeather(backendWeather, {
-      city: 'Hyderabad',
-      state: 'Telangana',
-      country: 'India'
-    });
+    // Convert backend weather into
+    // frontend CurrentWeather format
+    return normalizeWeather(
+      backendWeather,
+      {
+        city: base.city,
+        state: base.state,
+        country: base.country
+      }
+    );
   }, [
     currentCityId,
     activeScenario,
@@ -151,10 +195,15 @@ export const App: React.FC = () => {
       {/* Header & Controls */}
       <Navbar
         currentCityId={currentCityId}
-        onCityChange={setCurrentCityId}
+        onCityChange={(cityId) => {
+          setCurrentCityId(cityId);
+          setBackendWeather(null);
+        }}
         activeScenario={activeScenario}
         onScenarioChange={setActiveScenario}
-        isSafetyOverrideActive={isSafetyOverrideActive}
+        isSafetyOverrideActive={
+          isSafetyOverrideActive
+        }
         onToggleSafetyOverride={() =>
           setIsSafetyOverrideActive(
             !isSafetyOverrideActive
@@ -165,16 +214,18 @@ export const App: React.FC = () => {
         }
       />
 
-      {/* Weather Status */}
+      {/* Weather Loading */}
       {weatherLoading && (
         <div className="weather-status">
           Loading live weather...
         </div>
       )}
 
+      {/* Weather Error */}
       {weatherError && (
         <div className="weather-status">
-          Live weather unavailable. Showing demo weather.
+          Live weather unavailable. Showing demo
+          weather.
         </div>
       )}
 
@@ -201,7 +252,9 @@ export const App: React.FC = () => {
         suitability={suitability}
         activePersona={activePersona}
         alert={MOCK_SEVERE_ALERT}
-        isSafetyOverrideActive={isSafetyOverrideActive}
+        isSafetyOverrideActive={
+          isSafetyOverrideActive
+        }
         onToggleSimulation={() =>
           setIsSafetyOverrideActive(
             !isSafetyOverrideActive
