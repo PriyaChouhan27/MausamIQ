@@ -1,4 +1,3 @@
-
 export interface BackendWeather {
   temperature: number;
   apparentTemperature: number;
@@ -7,7 +6,6 @@ export interface BackendWeather {
   windDirection: number;
   precipitation: number;
   weatherCode: number;
-
   pressure?: number;
   visibility?: number;
   uvIndex?: number;
