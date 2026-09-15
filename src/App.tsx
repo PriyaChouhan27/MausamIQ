@@ -4,12 +4,12 @@ import type { PersonaId } from './types';
 import {
   PERSONAS,
   MOCK_WEATHER_DATA,
-  WEATHER_SCENARIOS,
-  MOCK_SEVERE_ALERT
+  WEATHER_SCENARIOS
 } from './data/mockData';
 
 import { getSuitabilityForPersona } from './smart/suitabilityCalculators';
 import { calculateWidgetPriorities } from './engine/personalizationEngine';
+import { generateWeatherAlert } from './intelligence/weatherAlerts';
 
 import { Navbar } from './components/Navbar';
 import { PersonaSelector } from './components/PersonaSelector';
@@ -175,17 +175,23 @@ export const App: React.FC = () => {
     );
   }, [activePersonaId]);
 
+  // Generate live weather alert
+  const liveAlert = useMemo(() => {
+    return generateWeatherAlert(currentWeather);
+  }, [currentWeather]);
+
   // Calculate prioritized widgets
   const prioritizedWidgets = useMemo(() => {
     return calculateWidgetPriorities({
       personaId: activePersonaId,
       weather: currentWeather,
-      alert: MOCK_SEVERE_ALERT,
+      alert: liveAlert,
       isSafetyOverrideActive
     });
   }, [
     activePersonaId,
     currentWeather,
+    liveAlert,
     isSafetyOverrideActive
   ]);
 
@@ -251,7 +257,7 @@ export const App: React.FC = () => {
         currentWeather={currentWeather}
         suitability={suitability}
         activePersona={activePersona}
-        alert={MOCK_SEVERE_ALERT}
+        alert={liveAlert}
         isSafetyOverrideActive={
           isSafetyOverrideActive
         }
