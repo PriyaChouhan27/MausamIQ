@@ -1,5 +1,12 @@
 import React from 'react';
-import type { PrioritizedWidget, CurrentWeather, SuitabilityMetric, PersonaProfile, WeatherAlert } from '../types';
+import type {
+  PrioritizedWidget,
+  CurrentWeather,
+  SuitabilityMetric,
+  PersonaProfile,
+  WeatherAlert
+} from '../types';
+
 import { SafetyAlertBanner } from './SafetyAlertBanner';
 import { CurrentWeatherCard } from './widgets/CurrentWeatherCard';
 import { SuitabilityCard } from './widgets/SuitabilityCard';
@@ -19,7 +26,7 @@ interface PrioritizedGridProps {
   currentWeather: CurrentWeather;
   suitability: SuitabilityMetric;
   activePersona: PersonaProfile;
-  alert: WeatherAlert;
+  alert: WeatherAlert | null;
   isSafetyOverrideActive: boolean;
   onToggleSimulation: () => void;
 }
@@ -33,9 +40,16 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
   isSafetyOverrideActive,
   onToggleSimulation
 }) => {
-  const renderWidget = (widget: PrioritizedWidget, rankNumber: number) => {
+  const renderWidget = (
+    widget: PrioritizedWidget,
+    rankNumber: number
+  ) => {
     switch (widget.id) {
       case 'safety_alert':
+        if (!alert) {
+          return null;
+        }
+
         return (
           <SafetyAlertBanner
             key={widget.id}
@@ -44,6 +58,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             onToggleSimulation={onToggleSimulation}
           />
         );
+
       case 'persona_suitability':
         return (
           <SuitabilityCard
@@ -54,6 +69,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'best_time_window':
         return (
           <BestTimeCard
@@ -63,6 +79,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'current_weather':
         return (
           <CurrentWeatherCard
@@ -72,6 +89,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'hourly_forecast':
         return (
           <HourlyForecastCard
@@ -80,6 +98,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'daily_forecast':
         return (
           <DailyForecastCard
@@ -88,6 +107,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'traveler_comparison':
         return (
           <TravelerCard
@@ -97,6 +117,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'agriculture_insights':
         return (
           <AgricultureCard
@@ -106,6 +127,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'commuter_advisory':
         return (
           <CommuterCard
@@ -115,6 +137,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'health_environment':
         return (
           <HealthCard
@@ -124,6 +147,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'beach_coastal':
         return (
           <BeachSurfCard
@@ -133,6 +157,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'event_planner':
         return (
           <EventPlannerCard
@@ -142,6 +167,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       case 'family_outdoor':
         return (
           <FamilyParentCard
@@ -151,6 +177,7 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
             rankNumber={rankNumber}
           />
         );
+
       default:
         return null;
     }
@@ -158,7 +185,9 @@ export const PrioritizedGrid: React.FC<PrioritizedGridProps> = ({
 
   return (
     <main className="homepage-grid">
-      {prioritizedWidgets.map((widget, index) => renderWidget(widget, index + 1))}
+      {prioritizedWidgets.map((widget, index) =>
+        renderWidget(widget, index + 1)
+      )}
     </main>
   );
 };
